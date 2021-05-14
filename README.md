@@ -212,6 +212,27 @@ To avoid having to download a nix-channel every time the VM is reset, you can us
 
 This will add the nixpkgs that is used for the VM in the NIX_PATH of login shell.
 
+## Darwin
+
+With following changes in place:
+- https://github.com/NixOS/nixpkgs/issues/121903#issuecomment-836315774
+- https://github.com/NixOS/nixpkgs/pull/122420
+- https://github.com/Infinisil/nixpkgs/commit/4d244410ee0f3e3ece5494533217bbafbd95d9b3
+- https://github.com/NixOS/nixpkgs/issues/108984#issuecomment-819436585
+- https://github.com/dermetfan/nixos-shell/commit/28ea39e0b76698e7dbd198e9755d7dbc12bf5146
+- https://github.com/r2r-dev/nixpkgs/commit/58142a0fa46a3e920cb4e92fcd0420eeec62ae27
+- https://github.com/NixOS/nixpkgs/pull/72354
+
+It is possible to use nixos-shell on darwin host. Word of notice, you will need a remote x86_64-linux builder in order to produce a VM image.
+
+```
+# Install nixos-shell from source:
+nix-env -i -f .
+
+# Run darwin example:
+nixos-shell examples/darwin.nix -- -- --argstr system x86_64-linux -I nixpkgs=http://github.com/r2r-dev/nixpkgs/archive/58142a0fa46a3e920cb4e92fcd0420eeec62ae27.tar.gz
+```
+
 ## More configuration
 
 Have a look at the [virtualisation] options NixOS provides.

@@ -1,4 +1,5 @@
-#!/usr/bin/env bash
+#! /usr/bin/env nix-shell
+#! nix-shell -i bash -p bash coreutils
 
 set -euo pipefail
 
@@ -54,6 +55,6 @@ trap cleanup EXIT SIGINT SIGQUIT ERR
 nix-build '<nixpkgs/nixos>' -A vm -k \
   -I "nixos-config=${script_dir}/../share/nixos-shell/nixos-shell.nix" \
   -o "${tempdir}/result" \
-  "${extraBuildFlags[@]}"
+  "${extraBuildFlags[@]}" \
   "$@"
 "${tempdir}/result/bin/"run-*-vm
