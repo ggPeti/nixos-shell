@@ -222,6 +222,12 @@ With following changes in place:
 - https://github.com/dermetfan/nixos-shell/commit/28ea39e0b76698e7dbd198e9755d7dbc12bf5146
 - https://github.com/r2r-dev/nixpkgs/commit/58142a0fa46a3e920cb4e92fcd0420eeec62ae27
 - https://github.com/NixOS/nixpkgs/pull/72354
+- https://mail.gnu.org/archive/html/qemu-devel/2021-02/msg04637.html
+- https://patchwork.kernel.org/project/qemu-devel/patch/20210103145055.11074-1-r.bolshakov@yadro.com/
+- https://patchwork.kernel.org/project/qemu-devel/list/?series=400619&state=%2A&archive=both
+- https://github.com/thefloweringash/nixpkgs/tree/apple-silicon/pkgs/os-specific/darwin/apple-sdk-11.0
+- https://github.com/thefloweringash/nixpkgs/blob/apple-silicon/pkgs/os-specific/darwin/rewrite-tbd/default.nix
+
 
 It is possible to use nixos-shell on darwin host. Word of notice, you will need a remote x86_64-linux builder in order to produce a VM image.
 
@@ -229,8 +235,12 @@ It is possible to use nixos-shell on darwin host. Word of notice, you will need 
 # Install nixos-shell from source:
 nix-env -i -f .
 
-# Run darwin example:
-nixos-shell examples/darwin.nix -- -- --argstr system x86_64-linux -I nixpkgs=http://github.com/r2r-dev/nixpkgs/archive/58142a0fa46a3e920cb4e92fcd0420eeec62ae27.tar.gz
+# Build darwin example:
+nixos-shell examples/darwin.nix -- -- --argstr system x86_64-linux -I nixpkgs=http://github.com/r2r-dev/nixpkgs/archive/f68911645209742013dd6abe570a23548d9a5780.tar.gz --option builders-use-substitutes true
+
+# Grab build output and run is as root (if you wish to use vmnet)
+sudo /nix/store/somehash-nixos-vm/bin/run-nixos-vm
+
 ```
 
 ## More configuration

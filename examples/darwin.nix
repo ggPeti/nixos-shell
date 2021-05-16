@@ -39,15 +39,24 @@
     shareExchangeDir = true;
 
     qemu = {
+      options = [ "-accel hvf" ];
+       # use vmnet adapter
       networkingOptions = [
-        "-net nic,netdev=user.0,model=virtio"
-        "-netdev user,id=user.0,hostfwd=tcp::2222-:22"
+        "-net nic,model=virtio,netdev=hn0"
+        "-netdev vmnet-macos,id=hn0,mode=bridged,ifname=en8"
       ];
       pkgs = import <nixpkgs> {
         system = "x86_64-darwin";
         overlays = [
           (self: super: {
             qemu = super.qemu.overrideAttrs (attrs: {
+              buildInputs = attrs.buildInputs
+                ++ [ super.darwin.apple_sdk_11.frameworks.vmnet ];
+              sandboxProfile = ''
+                (allow file-read* file-write* process-exec mach-lookup)
+                ; block homebrew dependencies
+                (deny file-read* file-write* process-exec mach-lookup (subpath "/usr/local") (with no-log))
+              '';
               preConfigure = attrs.preConfigure
                 + "substituteInPlace meson.build --replace 'if exe_sign' 'if false'";
             });
