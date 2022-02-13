@@ -31,6 +31,27 @@ Instead of `vm.nix`, `nixos-shell` also accepts other modules on the command lin
 $ nixos-shell some-nix-module.nix
 ```
 
+You can also start a vm from a flake's `nixosConfigurations` using the `--flake` flag.
+
+```console
+$ nixos-shell --flake github:Mic92/nixos-shell#vm-forward
+```
+
+This will run the `vm-forward` example.
+
+> Note: system configurations have to be made overridable with `lib.makeOverridable` to use them with `nixos-shell`
+>```nix
+>{
+>  nixosConfigurations = let
+>    lib = nixpkgs.lib;
+>  in {
+>    vm = lib.makeOverridable lib.nixosSystem {
+>      # ...
+>    };
+>  };
+>}
+>```
+
 ## Terminating the virtual machine
 
 Type `Ctrl-a x` to exit the virtual machine.
@@ -83,10 +104,10 @@ set - otherwise you will need to start VM as root. On NixOS this can be achieved
 
 ## RAM
 
-By default qemu will allow at most 500MB of RAM, this can be increased using `virtualisation.memorySize`.
+By default qemu will allow at most 500MB of RAM, this can be increased using `virtualisation.memorySize` (size in megabyte).
 
 ```nix
-{ virtualisation.memorySize = "1024M"; }
+{ virtualisation.memorySize = 1024; }
 ```
 
 ## CPUs
@@ -99,10 +120,10 @@ To increase the CPU count use `virtualisation.cores` (defaults to 1):
 
 ## Hard drive
 
-To increase the size of the virtual hard drive, i. e. times 20 (see [virtualisation] options at bottom, defaults to 512M):
+To increase the size of the virtual hard drive, i. e. to 20 GB (see [virtualisation] options at bottom, defaults to 512M):
 
 ```nix
-{ virtualisation.diskSize = 20 * 512; }
+{ virtualisation.diskSize = 20 * 1024; }
 ```
 
 Notice that for this option to become effective you may also need to delete previous block device files created by qemu (`nixos.qcow2`).
@@ -211,6 +232,27 @@ To avoid having to download a nix-channel every time the VM is reset, you can us
 ```
 
 This will add the nixpkgs that is used for the VM in the NIX_PATH of login shell.
+
+## Darwin
+
+With following changes in place:
+- https://github.com/NixOS/nixpkgs/issues/121903#issuecomment-836315774
+- https://github.com/NixOS/nixpkgs/pull/122420
+- https://github.com/Infinisil/nixpkgs/commit/4d244410ee0f3e3ece5494533217bbafbd95d9b3
+- https://github.com/NixOS/nixpkgs/issues/108984#issuecomment-819436585
+- https://github.com/dermetfan/nixos-shell/commit/28ea39e0b76698e7dbd198e9755d7dbc12bf5146
+- https://github.com/r2r-dev/nixpkgs/commit/58142a0fa46a3e920cb4e92fcd0420eeec62ae27
+- https://github.com/NixOS/nixpkgs/pull/72354
+
+It is possible to use nixos-shell on darwin host. Word of notice, you will need a remote x86_64-linux builder in order to produce a VM image.
+
+```
+# Install nixos-shell from source:
+nix-env -i -f .
+
+# Run darwin example:
+nixos-shell examples/darwin.nix -- -- --argstr system x86_64-linux -I nixpkgs=http://github.com/r2r-dev/nixpkgs/archive/58142a0fa46a3e920cb4e92fcd0420eeec62ae27.tar.gz
+```
 
 ## More configuration
 

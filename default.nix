@@ -1,4 +1,8 @@
-with import <nixpkgs> {};
+{
+  pkgs ? import <nixpkgs> {},
+}:
+
+with pkgs;
 stdenv.mkDerivation {
   name = "nixos-shell";
   src = builtins.filterSource
@@ -7,8 +11,12 @@ stdenv.mkDerivation {
                  baseNameOf path != ".direnv" &&
                  baseNameOf path != "result"
     ) ./.;
-  buildInputs = [ bash ];
+  nativeBuildInputs = [ makeWrapper ];
   preConfigure = ''
     export PREFIX=$out
+  '';
+  postInstall = ''
+    wrapProgram $out/bin/nixos-shell \
+      --prefix PATH : ${lib.makeBinPath [ jq coreutils gawk ]}
   '';
 }
