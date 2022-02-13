@@ -31,6 +31,27 @@ Instead of `vm.nix`, `nixos-shell` also accepts other modules on the command lin
 $ nixos-shell some-nix-module.nix
 ```
 
+You can also start a vm from a flake's `nixosConfigurations` using the `--flake` flag.
+
+```console
+$ nixos-shell --flake github:Mic92/nixos-shell#vm-forward
+```
+
+This will run the `vm-forward` example.
+
+> Note: system configurations have to be made overridable with `lib.makeOverridable` to use them with `nixos-shell`
+>```nix
+>{
+>  nixosConfigurations = let
+>    lib = nixpkgs.lib;
+>  in {
+>    vm = lib.makeOverridable lib.nixosSystem {
+>      # ...
+>    };
+>  };
+>}
+>```
+
 ## Terminating the virtual machine
 
 Type `Ctrl-a x` to exit the virtual machine.
@@ -83,10 +104,10 @@ set - otherwise you will need to start VM as root. On NixOS this can be achieved
 
 ## RAM
 
-By default qemu will allow at most 500MB of RAM, this can be increased using `virtualisation.memorySize`.
+By default qemu will allow at most 500MB of RAM, this can be increased using `virtualisation.memorySize` (size in megabyte).
 
 ```nix
-{ virtualisation.memorySize = "1024M"; }
+{ virtualisation.memorySize = 1024; }
 ```
 
 ## CPUs
@@ -99,10 +120,10 @@ To increase the CPU count use `virtualisation.cores` (defaults to 1):
 
 ## Hard drive
 
-To increase the size of the virtual hard drive, i. e. times 20 (see [virtualisation] options at bottom, defaults to 512M):
+To increase the size of the virtual hard drive, i. e. to 20 GB (see [virtualisation] options at bottom, defaults to 512M):
 
 ```nix
-{ virtualisation.diskSize = 20 * 512; }
+{ virtualisation.diskSize = 20 * 1024; }
 ```
 
 Notice that for this option to become effective you may also need to delete previous block device files created by qemu (`nixos.qcow2`).
